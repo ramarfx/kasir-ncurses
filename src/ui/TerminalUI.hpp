@@ -1,10 +1,19 @@
 #pragma once
 #include <ncurses.h>
+#include <string>
+
+using namespace std;
 
 class TerminalUI {
+    private:
+        WINDOW* menuWin;
+        WINDOW* mainWin;
+        WINDOW* statusWin;
+        string msg;
+
     public:
         void init();
-        void menuWindow(WINDOW* win);
-        void mainWindow(WINDOW* win);
+        void draw();
         void close();
+        void setStatus(const string& msg);
 };
