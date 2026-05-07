@@ -1,0 +1,9 @@
+CXX = g++
+CXXFLAGS = -Wall -std=c++17
+
+SRC = $(wildcard src/**/*.cpp) src/main.cpp
+
+OUT = kasir
+
+all:
+	$(CXX) $(SRC) $(CXXFLAGS) -lncurses -o $(OUT)
