@@ -9,11 +9,15 @@ class TerminalUI {
         WINDOW* menuWin;
         WINDOW* mainWin;
         WINDOW* statusWin;
+        WINDOW* infoWin;
         string msg;
 
     public:
         void init();
         void draw();
+        void refresh();
         void close();
+
         void setStatus(const string& msg);
+        int getInput();
 };

@@ -11,22 +11,27 @@ void TerminalUI::init() {
     cbreak();
     noecho();
     curs_set(0);
-
+    
     start_color();
     use_default_colors();
     init_pair(1, COLOR_BLACK, COLOR_GREEN);
-
+    init_pair(2, COLOR_BLUE, -1);
+    
     int width, height;
     getmaxyx(stdscr, height, width);
-
-    refresh();
-
+    
+    ::refresh();
+    
     int menuWidth = width / 3;
     int statusHeight = 3;
-
-    menuWin = newwin(height - statusHeight, menuWidth, 0, 0);
-    mainWin = newwin(height - statusHeight, width - (width / 3), 0, menuWidth);
-    statusWin = newwin(statusHeight, width, height - statusHeight, 0);
+    int infoWinHeight = 1;
+    
+    menuWin = newwin(height - statusHeight - infoWinHeight, menuWidth, 0, 0);
+    mainWin = newwin(height - statusHeight - infoWinHeight, width - menuWidth, 0, menuWidth);
+    statusWin = newwin(statusHeight, width, height - statusHeight - infoWinHeight , 0);
+    infoWin = newwin(infoWinHeight, width, height - infoWinHeight, 0);
+    
+    keypad(menuWin, TRUE);
 }
 
 void menuWindow(WINDOW* win) {
@@ -64,17 +69,37 @@ void statusWindow(WINDOW* win, string& msg) {
     wrefresh(win);
 }
 
+void infoWindow(WINDOW* win) {
+    wattron(win, COLOR_PAIR(2));
+    mvwprintw(win, 0, 2, "← → ↑ ↓ navigasi | q: quit | STATUS: ");
+    wattroff(win, COLOR_PAIR(2));
+    wrefresh(win);
+}
+
 void TerminalUI::setStatus(const string& msg) { this->msg = msg; }
 
 void TerminalUI::draw() {
     menuWindow(menuWin);
     mainWindow(mainWin);
     statusWindow(statusWin, msg);
+    infoWindow(infoWin);
+}
+
+void TerminalUI::refresh() {
+    werase(menuWin);
+    werase(mainWin);
+    werase(statusWin);
+    werase(infoWin);
 }
 
 void TerminalUI::close() {
     delwin(menuWin);
     delwin(mainWin);
     delwin(statusWin);
+    delwin(infoWin);
     endwin();
+}
+
+int TerminalUI::getInput() {
+    return wgetch(menuWin);
 }

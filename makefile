@@ -7,4 +7,4 @@ SRC = $(shell find src -name '*.cpp')
 OUT = kasir
 
 all:
-	$(CXX) $(SRC) $(CXXFLAGS) -lncurses -o $(OUT)
+	$(CXX) $(SRC) $(CXXFLAGS) -lncursesw -o $(OUT)
