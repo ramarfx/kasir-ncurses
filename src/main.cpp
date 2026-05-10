@@ -34,7 +34,7 @@ int main() {
                 break;
         }
 
-        ui.refresh();
+        ui.clearWindows();
     }
 
     ui.close();

@@ -1,91 +1,139 @@
 #include "TerminalUI.hpp"
+#include <stdlib.h>
 
-#include <ncurses.h>
-
-#include <string>
-
-using namespace std;
-
+// ==========================================
+// INISIALISASI
+// ==========================================
 void TerminalUI::init() {
+    initNcurses();
+    initColors();
+    initWindows();
+}
+
+void TerminalUI::initNcurses() {
     initscr();
     cbreak();
     noecho();
     curs_set(0);
-    
+}
+
+void TerminalUI::initColors() {
     start_color();
     use_default_colors();
-    init_pair(1, COLOR_BLACK, COLOR_GREEN);
-    init_pair(2, COLOR_BLUE, -1);
+    init_pair(1, COLOR_BLACK, COLOR_GREEN); // Warna Highlight
+    init_pair(2, COLOR_BLUE, -1);           // Warna Menu
+    init_pair(3, COLOR_CYAN, -1);           // Warna Judul
+}
+
+void TerminalUI::initWindows() {
+    getmaxyx(stdscr, screenHeight, screenWidth);
     
-    int width, height;
-    getmaxyx(stdscr, height, width);
+    // Proteksi layar terlalu kecil
+    if (screenHeight < 10 || screenWidth < 40) {
+        endwin();
+        printf("Ukuran terminal terlalu kecil!\n");
+        exit(1);
+    }
     
     ::refresh();
-    
-    int menuWidth = width / 3;
-    int statusHeight = 3;
-    int infoWinHeight = 1;
-    
-    menuWin = newwin(height - statusHeight - infoWinHeight, menuWidth, 0, 0);
-    mainWin = newwin(height - statusHeight - infoWinHeight, width - menuWidth, 0, menuWidth);
-    statusWin = newwin(statusHeight, width, height - statusHeight - infoWinHeight , 0);
-    infoWin = newwin(infoWinHeight, width, height - infoWinHeight, 0);
-    
-    keypad(menuWin, TRUE);
+
+    int menuWidth = screenWidth / 3;
+    int middleHeight = screenHeight - HEADER_HEIGHT - STATUS_HEIGHT - INFO_HEIGHT;
+
+    headerWin = newwin(HEADER_HEIGHT, screenWidth, 0, 0);
+    menuWin   = newwin(middleHeight, menuWidth, HEADER_HEIGHT, 0);
+    mainWin   = newwin(middleHeight, screenWidth - menuWidth, HEADER_HEIGHT, menuWidth);
+    statusWin = newwin(STATUS_HEIGHT, screenWidth, screenHeight - INFO_HEIGHT - STATUS_HEIGHT, 0);
+    infoWin   = newwin(INFO_HEIGHT, screenWidth, screenHeight - INFO_HEIGHT, 0);
+
+    keypad(menuWin, TRUE); // Aktifkan input panah
 }
 
-void menuWindow(WINDOW* win) {
-    box(win, 0, 0);
-    mvwprintw(win, 1, 2, "MENU");
 
-    mvwprintw(win, 3, 2, "1. Lihat menu");
-    mvwprintw(win, 4, 2, "2. Buat Pesanan");
-    mvwprintw(win, 5, 2, "3. Lihat Antrian");
-    mvwprintw(win, 6, 2, "4. Proses Antrian");
-    mvwprintw(win, 7, 2, "0. Exit");
+// ==========================================
+// HELPER
+// ==========================================
+void TerminalUI::drawRoundedBox(WINDOW* win) {
+    int w, h;
+    getmaxyx(win, h, w);
 
-    wrefresh(win);
-}
-
-void mainWindow(WINDOW* win) {
-    box(win, 0, 0);
-    mvwprintw(win, 1, 2, "ANTRIAN");
-
-    mvwprintw(win, 3, 2, "- ujang");
-    mvwprintw(win, 4, 2, "- asep");
-    mvwprintw(win, 5, 2, "- kekep");
-
-    wrefresh(win);
-}
-
-void statusWindow(WINDOW* win, string& msg) {
-    box(win, 0, 0);
-
-    if (msg.empty()) {
-        msg = "Ready";
+    for (int i = 1; i < w - 1; i++) {
+        mvwprintw(win, 0, i, "─");
+        mvwprintw(win, h - 1, i, "─");
     }
-
-    mvwprintw(win, 1, 2, "%s", msg.c_str());
-    wrefresh(win);
+    for (int i = 1; i < h - 1; i++) {
+        mvwprintw(win, i, 0, "│");
+        mvwprintw(win, i, w - 1, "│");
+    }
+    
+    mvwprintw(win, 0, 0, "╭");
+    mvwprintw(win, 0, w - 1, "╮");
+    mvwprintw(win, h - 1, 0, "╰");
+    mvwprintw(win, h - 1, w - 1, "╯");
 }
 
-void infoWindow(WINDOW* win) {
-    wattron(win, COLOR_PAIR(2));
-    mvwprintw(win, 0, 2, "← → ↑ ↓ navigasi | q: quit | STATUS: ");
-    wattroff(win, COLOR_PAIR(2));
-    wrefresh(win);
+void TerminalUI::drawBoxWithTitle(WINDOW* win, const std::string& title, int colorPair) {
+    drawRoundedBox(win);
+    wattron(win, COLOR_PAIR(colorPair) | A_BOLD);
+    mvwprintw(win, 0, 2, "─%s─", title.c_str());
+    wattroff(win, COLOR_PAIR(colorPair) | A_BOLD);
 }
 
-void TerminalUI::setStatus(const string& msg) { this->msg = msg; }
 
+// ==========================================
+// RENDER UI
+// ==========================================
+void TerminalUI::drawHeader() {
+    drawBoxWithTitle(headerWin, "[1] Project", 3);
+    mvwprintw(headerWin, 1, 2, "Aplikasi Kasir v1.0");
+    wrefresh(headerWin);
+}
+
+void TerminalUI::drawMenu() {
+    drawBoxWithTitle(menuWin, "[2] Services", 2);
+    mvwprintw(menuWin, 2, 2, "1. Lihat menu");
+    mvwprintw(menuWin, 3, 2, "2. Buat Pesanan");
+    mvwprintw(menuWin, 4, 2, "0. Exit");
+    wrefresh(menuWin);
+}
+
+void TerminalUI::drawMain() {
+    drawBoxWithTitle(mainWin, "[3] Logs", 3);
+    mvwprintw(mainWin, 2, 2, "- ujang");
+    mvwprintw(mainWin, 3, 2, "- asep");
+    wrefresh(mainWin);
+}
+
+void TerminalUI::drawStatus() {
+    drawRoundedBox(statusWin);
+    std::string currentMsg = statusMsg.empty() ? "Ready" : statusMsg;
+    
+    wattron(statusWin, COLOR_PAIR(1));
+    mvwprintw(statusWin, 1, 2, " STATUS: %s ", currentMsg.c_str());
+    wattroff(statusWin, COLOR_PAIR(1));
+    
+    wrefresh(statusWin);
+}
+
+void TerminalUI::drawInfo() {
+    mvwprintw(infoWin, 0, 2, "← → ↑ ↓: navigasi | q: quit | enter: pilih");
+    wrefresh(infoWin);
+}
+
+
+// ==========================================
+// PUBLIC METHODS
+// ==========================================
 void TerminalUI::draw() {
-    menuWindow(menuWin);
-    mainWindow(mainWin);
-    statusWindow(statusWin, msg);
-    infoWindow(infoWin);
+    drawHeader();
+    drawMenu();
+    drawMain();
+    drawStatus();
+    drawInfo();
 }
 
-void TerminalUI::refresh() {
+void TerminalUI::clearWindows() {
+    werase(headerWin);
     werase(menuWin);
     werase(mainWin);
     werase(statusWin);
@@ -93,11 +141,16 @@ void TerminalUI::refresh() {
 }
 
 void TerminalUI::close() {
+    delwin(headerWin);
     delwin(menuWin);
     delwin(mainWin);
     delwin(statusWin);
     delwin(infoWin);
     endwin();
+}
+
+void TerminalUI::setStatus(const std::string& msg) {
+    statusMsg = msg;
 }
 
 int TerminalUI::getInput() {
