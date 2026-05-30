@@ -109,9 +109,8 @@ void TerminalUI::drawMenuBorder() {
 void TerminalUI::drawMain() {
   drawBoxWithTitle(mainWin, "[3] Logs", 3);
 
-  Menu currentMenu = getStatus();
-
-  switch (currentMenu) {
+  // ROUTING BISA DITARUH DI SINI: TerminalUI melihat 'activeMenu' (yang di-set oleh Controller)
+  switch (activeMenu) {
   case Menu::LihatMenu:
     currentPage = &menuPage;
     break;
@@ -182,40 +181,8 @@ void TerminalUI::close() {
   endwin();
 }
 
-void TerminalUI::setStatus(const std::string &msg) { statusMsg = msg; }
+void TerminalUI::setStatusMsg(const std::string &msg) { statusMsg = msg; }
 
-Menu TerminalUI::getStatus() {
-  int pilihan = 0;
-
-  // Hindari program crash dengan menangani kasus string kosong atau invalid
-  // (Best Practice)
-  if (!statusMsg.empty()) {
-    try {
-      pilihan = std::stoi(statusMsg);
-    } catch (const std::exception &e) {
-      pilihan = 0; // Default jika gagal parse
-    }
-  }
-
-  switch (pilihan) {
-  case 0:
-    return Menu::LihatMenu;
-
-  case 1:
-    return Menu::BuatPesanan;
-
-  case 2:
-    return Menu::LihatAntrian;
-
-  case 3:
-    return Menu::ProsesAntrian;
-
-  case 4:
-    return Menu::Keluar;
-
-  default:
-    return Menu::Keluar;
-  }
-}
+void TerminalUI::setActiveMenu(Menu menu) { activeMenu = menu; }
 
 int TerminalUI::getInput() { return wgetch(menuWin); }

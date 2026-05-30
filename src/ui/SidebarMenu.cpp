@@ -24,11 +24,11 @@ int SidebarMenu::handleInput(int ch) {
     if (ch == KEY_UP) {
         selectedItem--;
         if (selectedItem < 0) selectedItem = 0;
-        return selectedItem;
     } else if (ch == KEY_DOWN) {
         selectedItem++;
         if (selectedItem >= (int)items.size()) selectedItem = (int)items.size() - 1;
-         return selectedItem;
+    } else if (ch == 10 || ch == KEY_ENTER) {
+        return selectedItem; // Baru berpindah saat ENTER ditekan
     }
 
     return -1;

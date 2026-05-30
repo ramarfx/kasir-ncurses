@@ -14,7 +14,11 @@ void AppController::run() {
         if (ch == 'q' || ch == KEY_EXIT) {
             isRunning = false;
         } else if (action != -1) {
-            ui.setStatus(std::to_string(action));
+            // CONTROLLER MENYURUH UI BERGANTI HALAMAN (Polymorphism/Routing Trigger)
+            ui.setActiveMenu(static_cast<Menu>(action));
+            
+            // Opsional: Bikin teks status keren di bawah
+            ui.setStatusMsg("Berpindah ke menu...");
         }
 
         ui.clearWindows();

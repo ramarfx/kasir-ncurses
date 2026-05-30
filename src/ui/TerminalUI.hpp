@@ -22,8 +22,9 @@ private:
     int screenWidth;
     int screenHeight;
 
-    // 3. State Aplikasi
-    std::string statusMsg;
+    // 3. State Aplikasi (Dipisahkan agar tidak campur aduk)
+    std::string statusMsg;              // Khusus untuk teks notifikasi di bawah
+    Menu activeMenu = Menu::LihatMenu;  // Khusus untuk menyimpan status halaman apa yang sedang aktif
 
     // 4. Konstanta Layout (Ubah ukuran desain dari sini!)
     static constexpr int HEADER_HEIGHT = 3;
@@ -60,8 +61,8 @@ public:
     void clearWindows(); // Diubah namanya dari refresh() agar tidak bentrok
     void close();
 
-    void setStatus(const std::string& msg);
-    Menu getStatus();
+    void setStatusMsg(const std::string& msg);
+    void setActiveMenu(Menu menu);
     int getInput();
 
     WINDOW* getMenuWindow() const { return menuWin; }
