@@ -14,7 +14,7 @@ void AppController::run() {
         if (ch == 'q' || ch == KEY_EXIT) {
             isRunning = false;
         } else if (action != -1) {
-            ui.setStatus("Action: " + std::to_string(action));
+            ui.setStatus(std::to_string(action));
         }
 
         ui.clearWindows();

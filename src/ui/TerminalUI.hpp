@@ -1,6 +1,12 @@
 #pragma once
 #include <ncurses.h>
 #include <string>
+#include "../utils/MenuEnums.hpp"
+
+#include "pages/antrian/ProcessAntrianPage.hpp"
+#include "pages/antrian/ShowAntrianPage.hpp"
+#include "pages/create-pesanan/CreatePesananPage.hpp"
+#include "pages/menu/MenuPage.hpp"
 
 class TerminalUI {
 private:
@@ -10,6 +16,7 @@ private:
     WINDOW* mainWin;
     WINDOW* statusWin;
     WINDOW* infoWin;
+    WINDOW* contentWin;
 
     // 2. Dimensi Layar
     int screenWidth;
@@ -39,6 +46,14 @@ private:
     void drawStatus();
     void drawInfo();
 
+    // 8. Objek Halaman dan Router
+    MenuPage menuPage; 
+    CreatePesananPage createPesananPage;
+    ShowAntrianPage showAntrianPage;
+    ProcessAntrianPage processAntrianPage;
+    
+    IPage* currentPage = nullptr; 
+
 public:
     void init();
     void draw();
@@ -46,6 +61,7 @@ public:
     void close();
 
     void setStatus(const std::string& msg);
+    Menu getStatus();
     int getInput();
 
     WINDOW* getMenuWindow() const { return menuWin; }
