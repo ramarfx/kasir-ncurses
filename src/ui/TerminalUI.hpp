@@ -34,7 +34,7 @@ private:
 
     // 7. Render Masing-masing Window
     void drawHeader();
-    void drawMenu();
+    void drawMenuBorder();
     void drawMain();
     void drawStatus();
     void drawInfo();
@@ -47,4 +47,7 @@ public:
 
     void setStatus(const std::string& msg);
     int getInput();
+
+    WINDOW* getMenuWindow() const { return menuWin; }
+    WINDOW* getMainWindow() const { return mainWin; }
 };

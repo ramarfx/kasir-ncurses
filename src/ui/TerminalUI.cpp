@@ -89,18 +89,17 @@ void TerminalUI::drawHeader() {
     wrefresh(headerWin);
 }
 
-void TerminalUI::drawMenu() {
-    drawBoxWithTitle(menuWin, "[2] Services", 2);
-    mvwprintw(menuWin, 2, 2, "1. Lihat menu");
-    mvwprintw(menuWin, 3, 2, "2. Buat Pesanan");
-    mvwprintw(menuWin, 4, 2, "0. Exit");
+void TerminalUI::drawMenuBorder() {
+    drawBoxWithTitle(menuWin, "[2] MENU", 2);
     wrefresh(menuWin);
 }
 
 void TerminalUI::drawMain() {
     drawBoxWithTitle(mainWin, "[3] Logs", 3);
-    mvwprintw(mainWin, 2, 2, "- ujang");
-    mvwprintw(mainWin, 3, 2, "- asep");
+
+    // 
+    // 
+
     wrefresh(mainWin);
 }
 
@@ -126,7 +125,7 @@ void TerminalUI::drawInfo() {
 // ==========================================
 void TerminalUI::draw() {
     drawHeader();
-    drawMenu();
+    drawMenuBorder();
     drawMain();
     drawStatus();
     drawInfo();
